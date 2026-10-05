@@ -1,0 +1,47 @@
+{
+  "name": "",
+  "locale": "",
+  "hour24": false,
+  "units": "metric",
+  "location": { "lat": 51.5072, "lon": -0.1276, "name": "London" },
+  "autoLocation": true,
+
+  "modules": {
+    "greeting": true,
+    "clock": true,
+    "weather": true,
+    "forecast": true,
+    "markets": true,
+    "news": true,
+    "quote": true,
+    "onThisDay": true,
+    "network": false
+  },
+
+  "markets": {
+    "crypto": [
+      { "id": "bitcoin", "label": "BTC" },
+      { "id": "ethereum", "label": "ETH" }
+    ],
+    "cryptoCurrency": "usd",
+    "fx": [{ "from": "EUR", "to": "USD" }],
+    "indices": [{ "symbol": "^GSPC", "label": "S&P 500" }]
+  },
+
+  "news": {
+    "feeds": [
+      { "url": "https://feeds.bbci.co.uk/news/world/rss.xml", "name": "BBC" },
+      { "url": "https://www.theguardian.com/world/rss", "name": "Guardian" },
+      { "url": "https://www.aljazeera.com/xml/rss/all.xml", "name": "Al Jazeera" },
+      { "url": "https://feeds.npr.org/1001/rss.xml", "name": "NPR" },
+      { "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "name": "NYT" }
+    ],
+    "local": [
+      { "url": "https://feeds.feedburner.com/ndtvnews-top-stories", "name": "NDTV" },
+      { "url": "https://indianexpress.com/section/india/feed/", "name": "Indian Express" },
+      { "url": "https://timesofindia.indiatimes.com/rssfeedstopstories.cms", "name": "Times of India" },
+      { "url": "https://www.thehindu.com/news/national/feeder/default.rss", "name": "The Hindu" },
+      { "url": "https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml", "name": "HT" }
+    ]
+  }
+}
