@@ -1,0 +1,78 @@
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Mira.Application.Markets;
+using Mira.Application.News;
+using Mira.Domain.Configuration;
+using Mira.Domain.Markets;
+using Mira.Domain.News;
+
+namespace Mira.Tests;
+
+public class ApiTests : IClassFixture<WebApplicationFactory<Program>>
+{
+    private sealed class FakeFeeds : IFeedReader
+    {
+        public Task<IReadOnlyList<NewsItem>> ReadAsync(Feed feed, CancellationToken ct) =>
+            Task.FromResult<IReadOnlyList<NewsItem>>(feed.Name == "Down" ? []
+                : Enumerable.Range(0, 15).Select(i => new NewsItem($"{feed.Name} {i}", feed.Name, null, DateTimeOffset.UnixEpoch.AddDays(i))).ToList());
+    }
+
+    private sealed class Quotes : ICryptoQuotes, IFxQuotes, IIndexQuotes
+    {
+        public Task<IReadOnlyDictionary<string, Quote>> GetAsync(IEnumerable<string> ids, string currency, CancellationToken ct) =>
+            throw new HttpRequestException("coingecko down");
+        public Task<Quote?> GetAsync(string from, string to, CancellationToken ct) => Task.FromResult<Quote?>(Quote.Of(1.1, 1.0, []));
+        public Task<Quote?> GetAsync(string symbol, CancellationToken ct) => Task.FromResult<Quote?>(null);
+    }
+
+    private readonly HttpClient _http;
+
+    public ApiTests(WebApplicationFactory<Program> factory) =>
+        _http = factory.WithWebHostBuilder(b => b.UseSetting("Mira:ConfigPath", "/nonexistent/config.json").ConfigureServices(s =>
+        {
+            s.AddSingleton<IFeedReader, FakeFeeds>();
+            s.AddSingleton<Quotes>().AddSingleton<ICryptoQuotes>(p => p.GetRequiredService<Quotes>())
+                .AddSingleton<IFxQuotes>(p => p.GetRequiredService<Quotes>()).AddSingleton<IIndexQuotes>(p => p.GetRequiredService<Quotes>());
+        })).CreateClient();
+
+    [Fact]
+    public async Task Health_and_config_defaults()
+    {
+        Assert.Equal(HttpStatusCode.OK, (await _http.GetAsync("/health")).StatusCode);
+        var cfg = await _http.GetFromJsonAsync<JsonElement>("/api/config");
+        Assert.Equal("metric", cfg.GetProperty("units").GetString());
+        Assert.True(cfg.GetProperty("modules").GetProperty("clock").GetBoolean());
+    }
+
+    [Fact]
+    public async Task News_is_merged_newest_first_and_capped_per_list()
+    {
+        var news = await _http.GetFromJsonAsync<JsonElement>("/api/news");
+        var world = news.GetProperty("world").EnumerateArray().ToList();
+        Assert.Equal(GetNewsHandler.MaxItems, world.Count);
+        Assert.EndsWith(" 14", world[0].GetProperty("title").GetString()); // newest first
+        Assert.Empty(news.GetProperty("local").EnumerateArray());
+    }
+
+    [Fact]
+    public async Task Markets_survive_one_source_being_down()
+    {
+        var rows = await _http.GetFromJsonAsync<JsonElement>("/api/markets");
+        var byKey = rows.EnumerateArray().ToDictionary(r => r.GetProperty("key").GetString()!);
+        Assert.Equal(JsonValueKind.Null, byKey["crypto:bitcoin"].GetProperty("quote").ValueKind);   // crypto source threw
+        Assert.Equal("EUR/USD", byKey["fx:EURUSD"].GetProperty("label").GetString());
+        Assert.True(byKey["fx:EURUSD"].GetProperty("invertColor").GetBoolean());
+        Assert.NotEqual(JsonValueKind.Null, byKey["fx:EURUSD"].GetProperty("quote").ValueKind);
+    }
+
+    [Theory]
+    [InlineData("/api/weather?lat=91&lon=0")]
+    [InlineData("/api/weather?lat=1&lon=0&units=kelvin")]
+    [InlineData("/api/places/reverse?lat=0&lon=181")]
+    [InlineData("/api/on-this-day?month=13&day=1")]
+    public async Task Bad_input_is_400(string url) => Assert.Equal(HttpStatusCode.BadRequest, (await _http.GetAsync(url)).StatusCode);
+}
