@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8983F2EB-06DB-4B95-B5AC-6C6576B9028A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mira.Api", "src\Mira.Api\Mira.Api.csproj", "{A5198612-BC1D-430D-8373-F58F1A548B9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mira.Application", "src\Mira.Application\Mira.Application.csproj", "{1C8E6C8B-9A1C-4EEC-BAA1-8EDC476A30DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mira.Domain", "src\Mira.Domain\Mira.Domain.csproj", "{5A39A0BE-7806-46C5-9C6C-8539EE0F8E3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mira.Infrastructure", "src\Mira.Infrastructure\Mira.Infrastructure.csproj", "{EA0134DC-4782-4D86-98CF-D0A8080D605E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D74DFABC-3CDD-46B7-8638-EAE2D60D3FCE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mira.Tests", "tests\Mira.Tests\Mira.Tests.csproj", "{416B9E9C-CBBC-4F48-BFC6-A5BCD64D3BDF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A5198612-BC1D-430D-8373-F58F1A548B9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5198612-BC1D-430D-8373-F58F1A548B9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5198612-BC1D-430D-8373-F58F1A548B9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5198612-BC1D-430D-8373-F58F1A548B9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C8E6C8B-9A1C-4EEC-BAA1-8EDC476A30DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C8E6C8B-9A1C-4EEC-BAA1-8EDC476A30DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C8E6C8B-9A1C-4EEC-BAA1-8EDC476A30DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C8E6C8B-9A1C-4EEC-BAA1-8EDC476A30DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A39A0BE-7806-46C5-9C6C-8539EE0F8E3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A39A0BE-7806-46C5-9C6C-8539EE0F8E3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A39A0BE-7806-46C5-9C6C-8539EE0F8E3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A39A0BE-7806-46C5-9C6C-8539EE0F8E3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA0134DC-4782-4D86-98CF-D0A8080D605E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA0134DC-4782-4D86-98CF-D0A8080D605E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA0134DC-4782-4D86-98CF-D0A8080D605E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA0134DC-4782-4D86-98CF-D0A8080D605E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{416B9E9C-CBBC-4F48-BFC6-A5BCD64D3BDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{416B9E9C-CBBC-4F48-BFC6-A5BCD64D3BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{416B9E9C-CBBC-4F48-BFC6-A5BCD64D3BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{416B9E9C-CBBC-4F48-BFC6-A5BCD64D3BDF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A5198612-BC1D-430D-8373-F58F1A548B9B} = {8983F2EB-06DB-4B95-B5AC-6C6576B9028A}
+		{1C8E6C8B-9A1C-4EEC-BAA1-8EDC476A30DC} = {8983F2EB-06DB-4B95-B5AC-6C6576B9028A}
+		{5A39A0BE-7806-46C5-9C6C-8539EE0F8E3E} = {8983F2EB-06DB-4B95-B5AC-6C6576B9028A}
+		{EA0134DC-4782-4D86-98CF-D0A8080D605E} = {8983F2EB-06DB-4B95-B5AC-6C6576B9028A}
+		{416B9E9C-CBBC-4F48-BFC6-A5BCD64D3BDF} = {D74DFABC-3CDD-46B7-8638-EAE2D60D3FCE}
+	EndGlobalSection
+EndGlobal
