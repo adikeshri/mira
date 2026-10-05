@@ -40,6 +40,27 @@ dotnet run --project src/Mira.Api    # http://127.0.0.1:5080
 dotnet test
 ```
 
+### Docker (Raspberry Pi)
+
+One image holds Mira and the built UI. Needs a 64-bit OS on a Pi 3/4/5 (32-bit also works with the armv7 runtime image),
+Docker with Compose, and the `mirror-magic` repo checked out next to this one.
+
+```bash
+git clone https://github.com/adikeshri/mira.git && git clone https://github.com/adikeshri/mirror-magic.git
+cd mira
+cp config.example.json config.json   # then edit it
+docker compose up -d --build         # http://127.0.0.1:5080
+```
+
+- The image builds on the device, so it always matches the CPU; building on a laptop for another architecture also works (the
+  build output is CPU-independent).
+- `config.json` is mounted read-only and re-read on every request: edit it and reload the page, no rebuild.
+- Port 5080 is published on `127.0.0.1` only. For other devices on your network, change the mapping to `"5080:5080"`.
+- Runs as an unprivileged user, read-only filesystem, all capabilities dropped; `restart: unless-stopped` and a health check.
+- Update: `git pull` in both repos, then `docker compose up -d --build`.
+- Kiosk: `chromium-browser --kiosk --noerrdialogs --disable-infobars http://127.0.0.1:5080`.
+- Without Compose: `docker build --build-context ui=../mirror-magic -t mira .`
+
 ### Hosting the UI
 
 Mira can serve mirror-magic's built UI itself, so nothing else needs to run:

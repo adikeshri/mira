@@ -1,0 +1,18 @@
+services:
+  mira:
+    build:
+      context: .
+      additional_contexts:
+        ui: ../mirror-magic   # the UI, built into the image
+    image: mira
+    restart: unless-stopped
+    ports:
+      # Loopback only: the mirror's own browser is the only client it needs.
+      # Use "5080:5080" to reach it from other devices on your network.
+      - "127.0.0.1:5080:5080"
+    volumes:
+      - ./config.json:/config/config.json:ro
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
