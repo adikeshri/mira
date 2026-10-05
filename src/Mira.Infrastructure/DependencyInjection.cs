@@ -31,6 +31,7 @@ public static class DependencyInjection
 
         s.AddHttpClient<IWeatherProvider, OpenMeteoWeatherProvider>(Client(10));
         s.AddHttpClient<IIpLocator, IpLocator>(Client(8));
+        s.AddHttpClient<IRouter, OsrmRouter>(Client(10));
         s.AddHttpClient<IPlaceNamer, NominatimPlaceNamer>(Client(10));
         s.AddHttpClient<IOnThisDayProvider, WikipediaOnThisDayProvider>(Client(10));
         s.AddHttpClient<ICryptoQuotes, CoinGeckoQuotes>(Client(10));

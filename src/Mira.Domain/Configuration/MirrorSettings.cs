@@ -15,7 +15,13 @@ public sealed record MirrorSettings
     public ModuleToggles Modules { get; init; } = new();
     public MarketsSettings Markets { get; init; } = new();
     public NewsSettings News { get; init; } = new();
+    // Fixed places to time a drive to, e.g. Work. Empty means none.
+    // Mapbox public token for live-traffic commute times. Server-side only: GetSettingsHandler strips it.
+    public string? MapboxToken { get; init; }
+    public IReadOnlyList<Destination> Commute { get; init; } = [];
 }
+
+public sealed record Destination(string Name, double Lat, double Lon);
 
 public sealed record ModuleToggles
 {
