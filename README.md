@@ -40,5 +40,17 @@ dotnet run --project src/Mira.Api    # http://127.0.0.1:5080
 dotnet test
 ```
 
+### Hosting the UI
+
+Mira can serve mirror-magic's built UI itself, so nothing else needs to run:
+
+```bash
+(cd ../mirror-magic && npm ci && npm run build)
+Mira__UiPath=$PWD/../mirror-magic/dist dotnet run --project src/Mira.Api   # UI and API on :5080
+```
+
+For UI development, run `npm run dev` in mirror-magic (port 8080) with `VITE_MIRA_URL=http://127.0.0.1:5080`;
+Mira allows that origin via CORS (`Mira:AllowedOrigins`, GET only). When serving the UI, responses carry a strict CSP.
+
 Config path: `Mira:ConfigPath` (env `Mira__ConfigPath`). `config.json` is re-read on every request.
 Only feeds listed in `config.json` are ever fetched; clients never supply a URL.
