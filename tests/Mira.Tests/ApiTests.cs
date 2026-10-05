@@ -29,6 +29,11 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         public Task<Quote?> GetAsync(string symbol, CancellationToken ct) => Task.FromResult<Quote?>(null);
     }
 
+    private sealed class FixedSettings(MirrorSettings s) : Mira.Application.Configuration.ISettingsStore
+    {
+        public Task<MirrorSettings> GetAsync(CancellationToken ct) => Task.FromResult(s);
+    }
+
     private readonly HttpClient _http;
 
     public ApiTests(WebApplicationFactory<Program> factory) =>
@@ -38,6 +43,25 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>>
             s.AddSingleton<Quotes>().AddSingleton<ICryptoQuotes>(p => p.GetRequiredService<Quotes>())
                 .AddSingleton<IFxQuotes>(p => p.GetRequiredService<Quotes>()).AddSingleton<IIndexQuotes>(p => p.GetRequiredService<Quotes>());
         })).CreateClient();
+
+    [Fact]
+    public void Osrm_route_maps_to_minutes_and_km()
+    {
+        var j = JsonDocument.Parse("""{"routes":[{"duration":1510,"distance":12345}]}""").RootElement;
+        Assert.Equal(new Domain.Locations.Commute("Work", 25, 12.3), Mira.Infrastructure.Locations.OsrmRouter.Map("Work", j));
+        var traffic = JsonDocument.Parse("""{"routes":[{"duration":1510,"duration_typical":1200,"distance":12345}]}""").RootElement;
+        Assert.Equal(20, Mira.Infrastructure.Locations.OsrmRouter.Map("Work", traffic)!.TypicalMinutes);
+        Assert.Null(Mira.Infrastructure.Locations.OsrmRouter.Map("Work", JsonDocument.Parse("""{"routes":[]}""").RootElement));
+    }
+
+    [Fact]
+    public async Task Commute_validates_coordinates_and_is_empty_without_destinations()
+    {
+        var store = new FixedSettings(new MirrorSettings { MapboxToken = "secret" });
+        Assert.Null((await new Mira.Application.Configuration.GetSettingsHandler(store).Handle(new(), default)).MapboxToken);
+        Assert.Equal(HttpStatusCode.BadRequest, (await _http.GetAsync("/api/commute?lat=91&lon=0")).StatusCode);
+        Assert.Empty((await _http.GetFromJsonAsync<JsonElement>("/api/commute?lat=1&lon=1")).EnumerateArray());
+    }
 
     [Fact]
     public async Task Health_and_config_defaults()

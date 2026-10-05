@@ -15,6 +15,9 @@ public static class LocationEndpoints
             _ => Results.Json(new { error = "location unavailable" }, statusCode: StatusCodes.Status502BadGateway),
         });
 
+        // Driving time from lat/lon to each configured destination (config "commute"); null entries failed.
+        api.MapGet("/commute", (double lat, double lon, ISender mediator, CancellationToken ct) => mediator.Send(new GetCommuteQuery(lat, lon), ct));
+
         api.MapGet("/places/reverse", async (double lat, double lon, ISender mediator, CancellationToken ct) =>
             new { name = await mediator.Send(new GetPlaceNameQuery(lat, lon), ct) });
     }

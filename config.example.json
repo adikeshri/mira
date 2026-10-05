@@ -5,6 +5,8 @@
   "units": "metric",
   "location": { "lat": 51.5072, "lon": -0.1276, "name": "London" },
   "autoLocation": true,
+  "mapboxToken": "",
+  "commute": [{ "name": "Work", "lat": 51.5155, "lon": -0.0922 }],
 
   "modules": {
     "greeting": true,
