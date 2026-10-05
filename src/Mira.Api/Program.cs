@@ -49,6 +49,7 @@ api.MapGroup("").WithTags("Weather").MapWeather();
 api.MapGroup("").WithTags("Markets").MapMarkets();
 api.MapGroup("").WithTags("News").MapNews();
 api.MapGroup("").WithTags("History").MapHistory();
+api.MapGroup("").WithTags("Network").MapNetwork();
 
 app.Run();
 

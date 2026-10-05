@@ -25,11 +25,12 @@ Each layer is organised by domain: Weather, Locations, Markets, News, History, C
 | `GET /api/markets` | `/api/indices` + browser calls to CoinGecko and Frankfurter; returns ready-made rows |
 | `GET /api/news` | `/api/feed/{n}` + client-side RSS parsing; returns `{ world, local }` |
 | `GET /api/on-this-day?month&day` | browser call to Wikipedia |
+| `GET /api/network/speed-test` | browser download from Cloudflare (2.5 MB, relayed) |
 | `GET /health` | |
 
 Swagger UI: `/swagger` (spec at `/swagger/v1/swagger.json`).
 
-The internet-speed test stays in the browser, since it measures the client's connection.
+The speed test is relayed, so it measures the slower of Mira's internet link and the mirror-to-Mira link; accurate when both are on one LAN.
 
 ## Run
 

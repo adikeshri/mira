@@ -4,12 +4,14 @@ using Mira.Application.Configuration;
 using Mira.Application.History;
 using Mira.Application.Locations;
 using Mira.Application.Markets;
+using Mira.Application.Network;
 using Mira.Application.News;
 using Mira.Application.Weather;
 using Mira.Infrastructure.Configuration;
 using Mira.Infrastructure.History;
 using Mira.Infrastructure.Locations;
 using Mira.Infrastructure.Markets;
+using Mira.Infrastructure.Network;
 using Mira.Infrastructure.News;
 using Mira.Infrastructure.Weather;
 
@@ -34,6 +36,7 @@ public static class DependencyInjection
         s.AddHttpClient<ICryptoQuotes, CoinGeckoQuotes>(Client(10));
         s.AddHttpClient<IFxQuotes, FrankfurterFxQuotes>(Client(10));
         s.AddHttpClient<IFeedReader, RssFeedReader>(Client(15));
+        s.AddHttpClient<ISpeedTestSource, CloudflareSpeedTestSource>(Client(15));
 
         s.AddHttpClient(YahooIndexQuotes.ClientName, c =>
         {
