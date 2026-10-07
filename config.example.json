@@ -8,6 +8,7 @@
   "autoLocation": true,
   "mapboxToken": "",
   "calendars": [{ "name": "Personal", "url": "https://calendar.google.com/calendar/ical/YOU%40gmail.com/private-TOKEN/basic.ics" }],
+  "display": { "layout": "auto", "nightDim": 0.6 },
   "commute": [{ "name": "Work", "lat": 51.5155, "lon": -0.0922 }],
 
   "modules": {

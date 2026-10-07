@@ -23,6 +23,17 @@ public sealed record MirrorSettings
     public IReadOnlyList<Destination> Commute { get; init; } = [];
     // iCal (.ics) URLs, merged by /api/calendar. The URLs are secrets: GetSettingsHandler strips them.
     public IReadOnlyList<Feed> Calendars { get; init; } = [];
+    public DisplaySettings Display { get; init; } = new();
+}
+
+public enum LayoutMode { Auto, Portrait, Landscape }
+
+public sealed record DisplaySettings
+{
+    // Auto follows the screen's shape; Portrait/Landscape force that arrangement.
+    public LayoutMode Layout { get; init; } = LayoutMode.Auto;
+    // Brightness from sunset to sunrise, 0.2 to 1 (1 = no dimming). The UI clamps it.
+    public double NightDim { get; init; } = 0.6;
 }
 
 public sealed record Destination(string Name, double Lat, double Lon);
