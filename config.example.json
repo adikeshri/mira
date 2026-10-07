@@ -1,11 +1,13 @@
 {
   "name": "",
   "locale": "",
+  "timeZone": "Europe/London",
   "hour24": false,
   "units": "metric",
   "location": { "lat": 51.5072, "lon": -0.1276, "name": "London" },
   "autoLocation": true,
   "mapboxToken": "",
+  "calendars": [{ "name": "Personal", "url": "https://calendar.google.com/calendar/ical/YOU%40gmail.com/private-TOKEN/basic.ics" }],
   "commute": [{ "name": "Work", "lat": 51.5155, "lon": -0.0922 }],
 
   "modules": {
@@ -17,7 +19,8 @@
     "news": true,
     "quote": true,
     "onThisDay": true,
-    "network": false
+    "network": false,
+    "calendar": true
   },
 
   "markets": {

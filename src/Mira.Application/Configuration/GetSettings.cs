@@ -12,5 +12,5 @@ public sealed record GetSettingsQuery : IRequest<MirrorSettings>;
 
 public sealed class GetSettingsHandler(ISettingsStore store) : IRequestHandler<GetSettingsQuery, MirrorSettings>
 {
-    public async Task<MirrorSettings> Handle(GetSettingsQuery q, CancellationToken ct) => (await store.GetAsync(ct)) with { MapboxToken = null };
+    public async Task<MirrorSettings> Handle(GetSettingsQuery q, CancellationToken ct) => (await store.GetAsync(ct)) with { MapboxToken = null, Calendars = [] };
 }

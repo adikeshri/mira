@@ -22,6 +22,7 @@ Each layer is organised by domain: Weather, Locations, Markets, News, History, C
 | `GET /api/location` | `/api/location` (IP estimate; 404 if `autoLocation` is off) |
 | `GET /api/places/reverse?lat&lon` | browser call to Nominatim |
 | `GET /api/commute?lat&lon` | driving time to each `commute` destination in `config.json` (live traffic with a Mapbox token, else free-flow via OSRM) |
+| `GET /api/calendar` | today's events only, merged from the iCal URLs in `config.json` `calendars` (all-day first, then by start; "today" follows `timeZone`) |
 | `GET /api/weather?lat&lon&units=metric\|imperial` | browser calls to Open-Meteo forecast + air quality |
 | `GET /api/markets` | `/api/indices` + browser calls to CoinGecko and Frankfurter; returns ready-made rows |
 | `GET /api/news` | `/api/feed/{n}` + client-side RSS parsing; returns `{ world, local }` |
@@ -79,3 +80,7 @@ Only feeds listed in `config.json` are ever fetched; clients never supply a URL.
 
 Commute traffic: put a free [Mapbox](https://account.mapbox.com) public token in `config.json` as `"mapboxToken"` (Directions API, results cached 5 min).
 Without it, `/api/commute` falls back to free-flow estimates and omits `typicalMinutes` (the usual drive time the UI compares traffic against). The token is never returned by `/api/config`.
+
+Calendars: list iCal (`.ics`) URLs in `config.json` as `"calendars": [{ "name", "url" }]`; they are merged by `/api/calendar`.
+The URLs are secrets (anyone with the link can read the calendar): they stay server-side and are stripped from `/api/config`.
+Google: Settings, your calendar, Integrate calendar, *Secret address in iCal format*. Outlook.com: Settings, Calendar, Shared calendars, Publish a calendar, ICS link.

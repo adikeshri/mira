@@ -7,6 +7,8 @@ public sealed record MirrorSettings
 {
     public string Name { get; init; } = "";
     public string Locale { get; init; } = "";
+    // IANA zone (e.g. "Europe/London") that defines "today" for the calendar. Empty means the server's own zone.
+    public string TimeZone { get; init; } = "";
     public bool Hour24 { get; init; }
     public Units Units { get; init; } = Units.Metric;
     public Locations.Location? Location { get; init; }
@@ -19,6 +21,8 @@ public sealed record MirrorSettings
     // Mapbox public token for live-traffic commute times. Server-side only: GetSettingsHandler strips it.
     public string? MapboxToken { get; init; }
     public IReadOnlyList<Destination> Commute { get; init; } = [];
+    // iCal (.ics) URLs, merged by /api/calendar. The URLs are secrets: GetSettingsHandler strips them.
+    public IReadOnlyList<Feed> Calendars { get; init; } = [];
 }
 
 public sealed record Destination(string Name, double Lat, double Lon);
@@ -34,6 +38,7 @@ public sealed record ModuleToggles
     public bool Quote { get; init; } = true;
     public bool OnThisDay { get; init; } = true;
     public bool Network { get; init; }
+    public bool Calendar { get; init; } = true;
 }
 
 public sealed record CryptoAsset(string Id, string Label);
