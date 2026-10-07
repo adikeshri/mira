@@ -54,7 +54,7 @@ public sealed class IcsCalendarReader(HttpClient http, IMemoryCache cache, ILogg
 
     public static IReadOnlyList<Event> Parse(string ics, string calendarName, DateTimeOffset from, DateTimeOffset to)
     {
-        Ical.Net.Calendar cal;
+        Ical.Net.Calendar? cal;
         try { cal = Ical.Net.Calendar.Load(ics); }
         catch (Exception e) when (e is not OperationCanceledException) { return []; }
         if (cal is null) return [];
