@@ -3,7 +3,9 @@ services:
     build:
       context: .
       additional_contexts:
-        ui: ../mirror-magic   # the UI, built into the image
+        # The UI is built into the image from this folder, so `git pull` there too. To always build the latest UI from GitHub
+        # instead, set UI_CONTEXT=https://github.com/adikeshri/mirror-magic.git#main
+        ui: ${UI_CONTEXT:-../mirror-magic}
     image: mira
     restart: unless-stopped
     ports:

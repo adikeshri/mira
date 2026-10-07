@@ -58,7 +58,12 @@ docker compose up -d --build         # http://127.0.0.1:5080
 - `config.json` is mounted read-only and re-read on every request: edit it and reload the page, no rebuild.
 - Port 5080 is published on `127.0.0.1` only. For other devices on your network, change the mapping to `"5080:5080"`.
 - Runs as an unprivileged user, read-only filesystem, all capabilities dropped; `restart: unless-stopped` and a health check.
-- Update: `git pull` in both repos, then `docker compose up -d --build`.
+- Update: the UI comes from the `mirror-magic` checkout next to this repo, so `git pull` in **both** repos (and make sure
+  `mirror-magic` is on the branch you want), then `docker compose up -d --build`. Plain `docker compose up -d` reuses the
+  old image. To always pick up the latest UI from GitHub without a second checkout, run with
+  `UI_CONTEXT=https://github.com/adikeshri/mirror-magic.git#main docker compose up -d --build`.
+- After an update the kiosk browser may need one reload (Ctrl+Shift+R) or a restart if it cached the old page before this
+  was fixed; from then on the page is revalidated on every load.
 - Kiosk: `chromium-browser --kiosk --noerrdialogs --disable-infobars http://127.0.0.1:5080`.
 - Without Compose: `docker build --build-context ui=../mirror-magic -t mira .`
 
