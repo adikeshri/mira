@@ -42,6 +42,16 @@ dotnet run --project src/Mira.Api    # http://127.0.0.1:5080
 dotnet test
 ```
 
+### Display
+
+```json
+"display": { "layout": "auto", "nightDim": 0.6 }
+```
+
+- `layout`: `auto` follows the screen's shape; `portrait` or `landscape` force that arrangement whatever the screen is.
+- `nightDim`: brightness from sunset to sunrise, 0.2 to 1 (1 turns dimming off). Sunset and sunrise come from the weather
+  data for the mirror's location, so it needs the weather module and assumes the device is in that location's time zone.
+
 ### Docker (Raspberry Pi)
 
 One image holds Mira and the built UI. Needs a 64-bit OS on a Pi 3/4/5 (32-bit also works with the armv7 runtime image),

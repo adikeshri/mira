@@ -23,4 +23,20 @@ public class FileSettingsStoreTests
             root.Delete(true);
         }
     }
+
+    [Fact]
+    public async Task Display_settings_default_to_auto_and_read_from_config()
+    {
+        var dir = Directory.CreateTempSubdirectory();
+        try
+        {
+            var none = await new FileSettingsStore(Path.Combine(dir.FullName, "missing.json"), NullLogger<FileSettingsStore>.Instance).GetAsync(default);
+            Assert.Equal((Mira.Domain.Configuration.LayoutMode.Auto, 0.6), (none.Display.Layout, none.Display.NightDim));
+
+            await File.WriteAllTextAsync(Path.Combine(dir.FullName, "c.json"), """{ "display": { "layout": "portrait", "nightDim": 0.4 } }""");
+            var set = await new FileSettingsStore(Path.Combine(dir.FullName, "c.json"), NullLogger<FileSettingsStore>.Instance).GetAsync(default);
+            Assert.Equal((Mira.Domain.Configuration.LayoutMode.Portrait, 0.4), (set.Display.Layout, set.Display.NightDim));
+        }
+        finally { dir.Delete(true); }
+    }
 }
