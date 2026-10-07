@@ -11,6 +11,8 @@ public class HostingTests : IClassFixture<WebApplicationFactory<Program>>, IDisp
     public HostingTests(WebApplicationFactory<Program> factory)
     {
         File.WriteAllText(Path.Combine(_ui.FullName, "index.html"), "<html>mirror</html>");
+        Directory.CreateDirectory(Path.Combine(_ui.FullName, "assets"));
+        File.WriteAllText(Path.Combine(_ui.FullName, "assets", "app-abc123.js"), "console.log(1)");
         _factory = factory.WithWebHostBuilder(b => b
             .UseSetting("Mira:ConfigPath", "/nonexistent/config.json")
             .UseSetting("Mira:UiPath", _ui.FullName));
@@ -30,6 +32,15 @@ public class HostingTests : IClassFixture<WebApplicationFactory<Program>>, IDisp
         var missing = await http.GetAsync("/api/nope");
         Assert.Equal(HttpStatusCode.NotFound, missing.StatusCode);
         Assert.DoesNotContain("mirror", await missing.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task Page_is_always_revalidated_but_hashed_assets_are_cached_forever()
+    {
+        var http = _factory.CreateClient();
+        Assert.Equal("no-cache", (await http.GetAsync("/")).Headers.CacheControl!.ToString());                       // index.html
+        Assert.Equal("no-cache", (await http.GetAsync("/some/client/route")).Headers.CacheControl!.ToString());      // SPA fallback is index.html too
+        Assert.Equal("public, max-age=31536000, immutable", (await http.GetAsync("/assets/app-abc123.js")).Headers.CacheControl!.ToString());
     }
 
     [Fact]

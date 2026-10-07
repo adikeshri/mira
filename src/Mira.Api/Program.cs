@@ -65,9 +65,17 @@ if (builder.Configuration["Mira:UiPath"] is { Length: > 0 } uiPath)
             }
             return next();
         });
+        // Hashed build assets never change, so cache them forever. Everything else (index.html above all) must be
+        // revalidated, or a browser that stays open (a kiosk) keeps running the old UI after an update.
+        var staticFiles = new StaticFileOptions
+        {
+            FileProvider = files,
+            OnPrepareResponse = r => r.Context.Response.Headers.CacheControl =
+                r.Context.Request.Path.StartsWithSegments("/assets") ? "public, max-age=31536000, immutable" : "no-cache",
+        };
         app.UseDefaultFiles(new DefaultFilesOptions { FileProvider = files });
-        app.UseStaticFiles(new StaticFileOptions { FileProvider = files });
-        app.MapFallbackToFile("index.html", new StaticFileOptions { FileProvider = files }); // single-page app
+        app.UseStaticFiles(staticFiles);
+        app.MapFallbackToFile("index.html", staticFiles); // single-page app
     }
 }
 
