@@ -27,6 +27,8 @@ COPY . .
 RUN dotnet publish src/Mira.Api -c Release -o /out --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
+# tzdata: the Alpine image has no time zones, which "timeZone" in config.json needs.
+RUN apk add --no-cache tzdata
 WORKDIR /app
 COPY --from=build /out ./
 COPY --from=ui-build /ui/dist ./ui

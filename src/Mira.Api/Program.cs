@@ -83,6 +83,7 @@ api.MapGroup("").WithTags("Locations").MapLocation();
 api.MapGroup("").WithTags("Weather").MapWeather();
 api.MapGroup("").WithTags("Markets").MapMarkets();
 api.MapGroup("").WithTags("News").MapNews();
+api.MapGroup("").WithTags("Calendar").MapCalendar();
 api.MapGroup("").WithTags("History").MapHistory();
 api.MapGroup("").WithTags("Network").MapNetwork();
 api.MapFallback(() => Results.NotFound(new { error = "not found" })); // unknown /api paths must not fall through to the UI
