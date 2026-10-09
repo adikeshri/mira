@@ -29,6 +29,7 @@ Each layer is organised by domain: Weather, Locations, Markets, News, History, C
 | `GET /api/on-this-day?month&day` | browser call to Wikipedia |
 | `GET /api/network/speed-test` | browser download from Cloudflare (2.5 MB, relayed) |
 | `GET /api/now-playing` | what the Pi is streaming: `{ state: playing\|paused\|stopped, title, artist, album, coverUrl, positionMs, durationMs }` |
+| `GET /api/now-playing/stream` | the same, pushed as server-sent events: current state on connect, then a message per change (the mirror uses this) |
 | `POST /api/now-playing?event&title&artist&album&cover&position&duration` | called by the player's event hook (see below) |
 | `GET /health` | |
 
