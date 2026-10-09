@@ -1,0 +1,19 @@
+using MediatR;
+using Mira.Application.Music;
+
+namespace Mira.Api.Endpoints;
+
+public static class MusicEndpoints
+{
+    public static void MapMusic(this IEndpointRouteBuilder api)
+    {
+        api.MapGet("/now-playing", async (ISender mediator, CancellationToken ct) => await mediator.Send(new GetNowPlayingQuery(), ct));
+
+        // Called by the player's event hook on the same machine (see README); the port is loopback-only by default.
+        api.MapPost("/now-playing", async (string @event, string? title, string? artist, string? album, string? cover, ISender mediator, CancellationToken ct) =>
+        {
+            await mediator.Send(new SetNowPlayingCommand(@event, title, artist, album, cover), ct);
+            return Results.NoContent();
+        });
+    }
+}

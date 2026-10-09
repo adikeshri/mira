@@ -57,7 +57,7 @@ if (builder.Configuration["Mira:UiPath"] is { Length: > 0 } uiPath)
             if (!ctx.Request.Path.StartsWithSegments("/swagger")) // Swagger UI needs inline scripts
             {
                 var h = ctx.Response.Headers;
-                h.ContentSecurityPolicy = "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self' data:; img-src 'self' data:; " +
+                h.ContentSecurityPolicy = "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self' data:; img-src 'self' data: https://i.scdn.co; " +
                                           "connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
                 h.XContentTypeOptions = "nosniff";
                 h["Referrer-Policy"] = "strict-origin-when-cross-origin";
@@ -94,6 +94,7 @@ api.MapGroup("").WithTags("News").MapNews();
 api.MapGroup("").WithTags("Calendar").MapCalendar();
 api.MapGroup("").WithTags("History").MapHistory();
 api.MapGroup("").WithTags("Network").MapNetwork();
+api.MapGroup("").WithTags("Music").MapMusic();
 api.MapFallback(() => Results.NotFound(new { error = "not found" })); // unknown /api paths must not fall through to the UI
 
 app.Run();
