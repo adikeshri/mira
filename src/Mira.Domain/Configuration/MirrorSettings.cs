@@ -48,6 +48,7 @@ public sealed record ModuleToggles
     public bool News { get; init; } = true;
     public bool Quote { get; init; } = true;
     public bool OnThisDay { get; init; } = true;
+    public bool Music { get; init; } = true;
     public bool Network { get; init; }
     public bool Calendar { get; init; } = true;
 }

@@ -93,6 +93,24 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotEqual(JsonValueKind.Null, byKey["fx:EURUSD"].GetProperty("quote").ValueKind);
     }
 
+    [Fact]
+    public async Task Now_playing_follows_player_events()
+    {
+        async Task<JsonElement> Now() => await _http.GetFromJsonAsync<JsonElement>("/api/now-playing");
+        Assert.Equal("stopped", (await Now()).GetProperty("state").GetString());
+
+        await _http.PostAsync("/api/now-playing?event=track_changed&title=Song&artist=A, B&album=Alb&cover=https://i.scdn.co/x", null);
+        await _http.PostAsync("/api/now-playing?event=playing", null);
+        var n = await Now();
+        Assert.Equal(("playing", "Song", "A, B"), (n.GetProperty("state").GetString(), n.GetProperty("title").GetString(), n.GetProperty("artist").GetString()));
+
+        await _http.PostAsync("/api/now-playing?event=paused", null);
+        Assert.Equal("paused", (await Now()).GetProperty("state").GetString());
+
+        await _http.PostAsync("/api/now-playing?event=stopped", null);
+        Assert.Equal(JsonValueKind.Null, (await Now()).GetProperty("title").ValueKind);
+    }
+
     [Theory]
     [InlineData("/api/weather?lat=91&lon=0")]
     [InlineData("/api/weather?lat=1&lon=0&units=kelvin")]

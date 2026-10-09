@@ -20,6 +20,7 @@
     "news": true,
     "quote": true,
     "onThisDay": true,
+    "music": true,
     "network": false,
     "calendar": true
   },
