@@ -1,15 +1,18 @@
+using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 using MediatR;
 using Mira.Domain.Music;
 
 namespace Mira.Application.Music;
 
-// The player (librespot's --onevent hook) pushes events; the mirror polls the latest state. Held in memory: a restart means "stopped".
+// The player (librespot's --onevent hook) pushes events; the mirror subscribes and is pushed every change. Held in memory: a restart means "stopped".
 // The player reports a position only on events, so while playing it is extrapolated from when it was reported.
 public sealed class NowPlayingState(TimeProvider clock)
 {
     private readonly object _gate = new();
     private NowPlaying _current = NowPlaying.Stopped;
     private DateTimeOffset _at = clock.GetUtcNow();
+    private readonly HashSet<Channel<NowPlaying>> _subscribers = [];
 
     public NowPlaying Get() { lock (_gate) return Advanced(); }
 
@@ -20,6 +23,28 @@ public sealed class NowPlayingState(TimeProvider clock)
         {
             _current = change(Advanced());
             _at = clock.GetUtcNow();
+            foreach (var s in _subscribers) s.Writer.TryWrite(_current);
+        }
+    }
+
+    // The current state first, then every change. A slow reader only ever misses stale states: the newest one is kept.
+    public async IAsyncEnumerable<NowPlaying> Subscribe([EnumeratorCancellation] CancellationToken ct)
+    {
+        var channel = Channel.CreateBounded<NowPlaying>(new BoundedChannelOptions(1) { FullMode = BoundedChannelFullMode.DropOldest });
+        NowPlaying first;
+        lock (_gate)
+        {
+            first = Advanced();
+            _subscribers.Add(channel);
+        }
+        try
+        {
+            yield return first;
+            await foreach (var n in channel.Reader.ReadAllAsync(ct)) yield return n;
+        }
+        finally
+        {
+            lock (_gate) _subscribers.Remove(channel);
         }
     }
 
@@ -35,8 +60,10 @@ public sealed record SetNowPlayingCommand(string Event, string? Title, string? A
 
 public sealed record GetNowPlayingQuery : IRequest<NowPlaying>;
 
+public sealed record StreamNowPlayingQuery : IStreamRequest<NowPlaying>;
+
 public sealed class NowPlayingHandler(NowPlayingState state) :
-    IRequestHandler<SetNowPlayingCommand>, IRequestHandler<GetNowPlayingQuery, NowPlaying>
+    IRequestHandler<SetNowPlayingCommand>, IRequestHandler<GetNowPlayingQuery, NowPlaying>, IStreamRequestHandler<StreamNowPlayingQuery, NowPlaying>
 {
     public Task Handle(SetNowPlayingCommand c, CancellationToken ct)
     {
@@ -52,6 +79,8 @@ public sealed class NowPlayingHandler(NowPlayingState state) :
     }
 
     public Task<NowPlaying> Handle(GetNowPlayingQuery q, CancellationToken ct) => Task.FromResult(state.Get());
+
+    public IAsyncEnumerable<NowPlaying> Handle(StreamNowPlayingQuery q, CancellationToken ct) => state.Subscribe(ct);
 
     private static string? Cap(string? s) => s is { Length: > 200 } ? s[..200] : s;
     private static string? HttpsOnly(string? url) => url is { Length: <= 500 } && url.StartsWith("https://", StringComparison.Ordinal) ? url : null;

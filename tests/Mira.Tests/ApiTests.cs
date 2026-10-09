@@ -117,6 +117,28 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.Equal(JsonValueKind.Null, (await Now()).GetProperty("title").ValueKind);
     }
 
+    [Fact]
+    public async Task Now_playing_stream_pushes_changes()
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        using var res = await _http.GetAsync("/api/now-playing/stream", HttpCompletionOption.ResponseHeadersRead, cts.Token);
+        Assert.Equal("text/event-stream", res.Content.Headers.ContentType?.MediaType);
+        using var reader = new StreamReader(await res.Content.ReadAsStreamAsync(cts.Token));
+
+        async Task<JsonElement> Next()
+        {
+            while (await reader.ReadLineAsync(cts.Token) is { } line)
+                if (line.StartsWith("data:")) return JsonDocument.Parse(line[5..]).RootElement;
+            throw new EndOfStreamException();
+        }
+
+        Assert.Equal(JsonValueKind.Object, (await Next()).ValueKind); // current state on connect
+        await _http.PostAsync("/api/now-playing?event=track_changed&title=Pushed&duration=1000", null);
+        var n = await Next();
+        Assert.Equal("Pushed", n.GetProperty("title").GetString());
+        Assert.Equal(1000, n.GetProperty("durationMs").GetInt64());
+    }
+
     [Theory]
     [InlineData("/api/weather?lat=91&lon=0")]
     [InlineData("/api/weather?lat=1&lon=0&units=kelvin")]
