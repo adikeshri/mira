@@ -99,12 +99,18 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         async Task<JsonElement> Now() => await _http.GetFromJsonAsync<JsonElement>("/api/now-playing");
         Assert.Equal("stopped", (await Now()).GetProperty("state").GetString());
 
-        await _http.PostAsync("/api/now-playing?event=track_changed&title=Song&artist=A, B&album=Alb&cover=https://i.scdn.co/x", null);
+        await _http.PostAsync("/api/now-playing?event=track_changed&title=Song&artist=A, B&album=Alb&cover=https://i.scdn.co/x&duration=200000", null);
         await _http.PostAsync("/api/now-playing?event=playing", null);
         var n = await Now();
         Assert.Equal(("playing", "Song", "A, B"), (n.GetProperty("state").GetString(), n.GetProperty("title").GetString(), n.GetProperty("artist").GetString()));
 
-        await _http.PostAsync("/api/now-playing?event=paused", null);
+        Assert.Equal(200000, n.GetProperty("durationMs").GetInt64());
+        Assert.True(n.GetProperty("positionMs").GetInt64() >= 0);
+
+        // The hook sends empty values for variables librespot did not set.
+        Assert.Equal(HttpStatusCode.NoContent, (await _http.PostAsync("/api/now-playing?event=playing&position=&duration=", null)).StatusCode);
+        await _http.PostAsync("/api/now-playing?event=paused&position=5000", null);
+        Assert.Equal(5000, (await Now()).GetProperty("positionMs").GetInt64());
         Assert.Equal("paused", (await Now()).GetProperty("state").GetString());
 
         await _http.PostAsync("/api/now-playing?event=stopped", null);

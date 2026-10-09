@@ -28,8 +28,8 @@ Each layer is organised by domain: Weather, Locations, Markets, News, History, C
 | `GET /api/news` | `/api/feed/{n}` + client-side RSS parsing; returns `{ world, local }` |
 | `GET /api/on-this-day?month&day` | browser call to Wikipedia |
 | `GET /api/network/speed-test` | browser download from Cloudflare (2.5 MB, relayed) |
-| `GET /api/now-playing` | what the Pi is streaming: `{ state: playing\|paused\|stopped, title, artist, album, coverUrl }` |
-| `POST /api/now-playing?event&title&artist&album&cover` | called by the player's event hook (see below) |
+| `GET /api/now-playing` | what the Pi is streaming: `{ state: playing\|paused\|stopped, title, artist, album, coverUrl, positionMs, durationMs }` |
+| `POST /api/now-playing?event&title&artist&album&cover&position&duration` | called by the player's event hook (see below) |
 | `GET /health` | |
 
 Swagger UI: `/swagger` (spec at `/swagger/v1/swagger.json`).
@@ -42,7 +42,8 @@ Raspotify (librespot) runs a script on every player event. Save this as `/usr/lo
 #!/bin/bash
 curl -fsS -m 3 -X POST -G http://127.0.0.1:5080/api/now-playing \
   --data-urlencode "event=$PLAYER_EVENT" --data-urlencode "title=$NAME" --data-urlencode "artist=${ARTISTS//$'\n'/, }" \
-  --data-urlencode "album=$ALBUM" --data-urlencode "cover=${COVERS%%$'\n'*}"
+  --data-urlencode "album=$ALBUM" --data-urlencode "cover=${COVERS%%$'\n'*}" \
+  --data-urlencode "position=$POSITION_MS" --data-urlencode "duration=$DURATION_MS"
 ```
 
 then add `LIBRESPOT_ONEVENT=/usr/local/bin/mira-onevent` to `/etc/raspotify/conf` and `sudo systemctl restart raspotify`.
